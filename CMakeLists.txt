@@ -6,7 +6,8 @@ set(CMAKE_CXX_STANDARD 17)
 add_executable(caos-photoshop
         main.c
         pic.h
-        pic.c)
+        pic.c
+        lut.c)
 
 find_package(OpenGL REQUIRED)
 find_package(GLUT REQUIRED)
