@@ -12,25 +12,24 @@ typedef byte RGB[NUM_BASE_COLORS];
 
 typedef struct {
     int width, height;
-    RGB *Pixels;
+    RGB *pixels;
 } PIC;
 
-void PutPixel(int X, int Y, int R, int G, int B);
+void PutPixel(int x, int y, int r, int g, int b);
 
-void PicDraw(PIC *P, int X0, int Y0);
-int PicCreate(PIC *P, int NewWidth, int NewHeight);
-int PicGet(PIC *P, int X, int Y, int C);
-int PicLoad(PIC *P, char *FileName);
-void PicFree(PIC *P);
-int PicSave(PIC *P, char *FileName);
+void PicDraw(PIC *pic, int x0, int y0);
+int PicCreate(PIC *pic, int newWidth, int newHeight);
+int PicGet(PIC *pic, int x, int y, int color);
+int PicLoad(PIC *pic, char *filename);
+void PicFree(PIC *pic);
+int PicSave(PIC *pic, char *filename);
 
-int Clamp(int X, int A, int B);
+int Clamp(int x, int left, int right);
 
-void LUTSetCopy(byte *LUT);
-void LUTSetNegative(byte *LUT);
-void LUTSetBrightness(byte *LUT, int Di);
-void LUTSetContrast(byte *LUT, int A, int B);
-void LUTSetGamma(byte *LUT, double Gamma);
-void LUTAutoContrast(byte *LUT, PIC *P);
-
-void LUTApply(PIC *PDest, PIC *PSrc, byte *LUT);
+void LUTSetCopy(byte *lut);
+void LUTSetNegative(byte *lut);
+void LUTSetBrightness(byte *lut, int di);
+void LUTSetContrast(byte *lut, int left, int right);
+void LUTSetGamma(byte *lut, double gamma);
+void LUTAutoContrast(byte *lut, PIC *pic);
+void LUTApply(PIC *picDest, PIC *picSrc, const byte *lut);

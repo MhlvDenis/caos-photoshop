@@ -1,76 +1,76 @@
 #include "pic.h"
 
-void PicDraw(PIC *P, int X0, int Y0) {
+void PicDraw(PIC *pic, int x0, int y0) {
     int offset = 0;
 
-    for (int y = 0; y < P->height; ++y) {
-        for (int x = 0; x < P->width; ++x, ++offset) {
-            PutPixel(X0 + x, Y0 + y, P->Pixels[offset][2], P->Pixels[offset][1],
-                     P->Pixels[offset][0]);
+    for (int y = 0; y < pic->height; ++y) {
+        for (int x = 0; x < pic->width; ++x, ++offset) {
+            PutPixel(x0 + x, y0 + y, pic->pixels[offset][2],
+                     pic->pixels[offset][1], pic->pixels[offset][0]);
         }
     }
 }
 
-int PicCreate(PIC *P, int NewWidth, int NewHeight) {
-    P->Pixels = malloc(NewWidth * NewHeight * sizeof(RGB));
-    if (P->Pixels == NULL) {
+int PicCreate(PIC *pic, int newWidth, int newHeight) {
+    pic->pixels = malloc(newWidth * newHeight * sizeof(RGB));
+    if (pic->pixels == NULL) {
         return 0;
     }
 
-    P->width = NewWidth;
-    P->height = NewHeight;
+    pic->width = newWidth;
+    pic->height = newHeight;
     return 1;
 }
 
-int PicGet(PIC *P, int X, int Y, int C) {
-    X = (X + P->width) % P->width;
-    Y = (Y + P->height) % P->height;
+int PicGet(PIC *pic, int x, int y, int color) {
+    x = (x + pic->width) % pic->width;
+    y = (y + pic->height) % pic->height;
 
-    return P->Pixels[X + Y * P->width][C];
+    return pic->pixels[x + y * pic->width][color];
 }
 
-int PicLoad(PIC *P, char *FileName) {
-    FILE *F;
+int PicLoad(PIC *pic, char *filename) {
+    FILE *file;
     short width, height;
 
-    P->width = P->height = 0;
-    P->Pixels = NULL;
+    pic->width = pic->height = 0;
+    pic->pixels = NULL;
 
-    if ((F = fopen(FileName, "rb")) == NULL) {
+    if ((file = fopen(filename, "rb")) == NULL) {
         return 0;
     }
 
-    fread(&width, 2, 1, F);
-    fread(&height, 2, 1, F);
-    if (!PicCreate(P, width, height)) {
-        fclose(F);
+    fread(&width, 2, 1, file);
+    fread(&height, 2, 1, file);
+    if (!PicCreate(pic, width, height)) {
+        fclose(file);
         return 0;
     }
 
-    fread(P->Pixels, sizeof(RGB), width * height, F);
-    fclose(F);
+    fread(pic->pixels, sizeof(RGB), width * height, file);
+    fclose(file);
     return 1;
 }
 
-void PicFree(PIC *P) {
-    if (P->Pixels != NULL) {
-        free(P->Pixels);
+void PicFree(PIC *pic) {
+    if (pic->pixels != NULL) {
+        free(pic->pixels);
     }
-    P->width = P->height = 0;
-    P->Pixels = NULL;
+    pic->width = pic->height = 0;
+    pic->pixels = NULL;
 }
 
-int PicSave(PIC *P, char *FileName) {
-    FILE *F;
+int PicSave(PIC *pic, char *filename) {
+    FILE *file;
 
-    if ((F = fopen(FileName, "wb")) == NULL) {
+    if ((file = fopen(filename, "wb")) == NULL) {
         return 0;
     }
 
-    fwrite(&P->width, 2, 1, F);
-    fwrite(&P->height, 2, 1, F);
-    fwrite(P->Pixels, 3, P->width * P->height, F);
+    fwrite(&pic->width, 2, 1, file);
+    fwrite(&pic->height, 2, 1, file);
+    fwrite(pic->pixels, 3, pic->width * pic->height, file);
 
-    fclose(F);
+    fclose(file);
     return 1;
 }
