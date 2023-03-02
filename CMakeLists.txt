@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.23)
+cmake_minimum_required(VERSION 3.22)
 project(caos-photoshop)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -6,7 +6,8 @@ set(CMAKE_CXX_STANDARD 17)
 add_executable(caos-photoshop
         main.c
         pic.h
-        pic.c)
+        pic.c
+        lut.c)
 
 find_package(OpenGL REQUIRED)
 find_package(GLUT REQUIRED)
