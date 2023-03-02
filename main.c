@@ -9,6 +9,19 @@ enum {
     MAX_FILENAME_LEN = 300,
 };
 
+enum MenuItems {
+    EXIT,
+    PIC_LOAD,
+    PIC_SAVE,
+
+    LUT_NEGATIVE,
+    LUT_CONTRAST_50_205,
+    LUT_CONTRAST_M50_255,
+    LUT_GAMMA_0P5,
+    LUT_GAMMA_2P4,
+    LUT_AUTO_CONTRAST,
+};
+
 unsigned char Frame[FRAME_H][FRAME_W][NUM_BASE_COLORS];
 float GlZoom = 2;
 
@@ -31,9 +44,10 @@ void MenuHandle(int value) {
     char destFilename[MAX_FILENAME_LEN] = "ape_modified.g24\0";
 
     switch (value) {
-    case 0:
+    // Main options
+    case EXIT:
         exit(0);
-    case 1:
+    case PIC_LOAD:
         PicFree(&workingPic);
         PicFree(&newlyProcessedPic);
         if (PicLoad(&newlyProcessedPic, sourceFilename)) {
@@ -41,28 +55,33 @@ void MenuHandle(int value) {
                       newlyProcessedPic.height);
         }
         break;
-    case 2:
+    case PIC_SAVE:
         PicSave(&newlyProcessedPic, destFilename);
         break;
-    default:
-        switch (value) {
-        case 10:
-            LUTSetNegative(lut);
-            break;
-        case 11:
-            // You are free to set your own lut transform params.
-            LUTSetContrast(lut, 50, 205);
-            break;
-        case 12:
-            LUTSetContrast(lut, -50, 255);
-            break;
-        case 13:
-            LUTSetGamma(lut, 0.5);
-            break;
-        case 14:
-            LUTSetGamma(lut, 2.4);
-            break;
-        }
+
+    // LUT options
+    case LUT_NEGATIVE:
+        LUTSetNegative(lut);
+        LUTApply(&newlyProcessedPic, &workingPic, lut);
+        break;
+    case LUT_CONTRAST_50_205:
+        LUTSetContrast(lut, 50, 205);
+        LUTApply(&newlyProcessedPic, &workingPic, lut);
+        break;
+    case LUT_CONTRAST_M50_255:
+        LUTSetContrast(lut, -50, 255);
+        LUTApply(&newlyProcessedPic, &workingPic, lut);
+        break;
+    case LUT_GAMMA_0P5:
+        LUTSetGamma(lut, 0.5);
+        LUTApply(&newlyProcessedPic, &workingPic, lut);
+        break;
+    case LUT_GAMMA_2P4:
+        LUTSetGamma(lut, 2.4);
+        LUTApply(&newlyProcessedPic, &workingPic, lut);
+        break;
+    case LUT_AUTO_CONTRAST:
+        LUTAutoContrast(lut, &workingPic);
         LUTApply(&newlyProcessedPic, &workingPic, lut);
         break;
     }
@@ -100,18 +119,19 @@ int main(int argc, char *argv[]) {
 
     lutMenu = glutCreateMenu(MenuHandle);
     glutSetMenu(lutMenu);
-    glutAddMenuEntry("Negative", 10);
-    glutAddMenuEntry("Contrast 50...205", 11);
-    glutAddMenuEntry("Contrast -50...255", 12);
-    glutAddMenuEntry("Gamma 0.5", 13);
-    glutAddMenuEntry("Gamma 2.4", 14);
+    glutAddMenuEntry("Negative", LUT_NEGATIVE);
+    glutAddMenuEntry("Contrast 50...205", LUT_CONTRAST_50_205);
+    glutAddMenuEntry("Contrast -50...255", LUT_CONTRAST_M50_255);
+    glutAddMenuEntry("Gamma 0.5", LUT_GAMMA_0P5);
+    glutAddMenuEntry("Gamma 2.4", LUT_GAMMA_2P4);
+    glutAddMenuEntry("Auto contrast", LUT_AUTO_CONTRAST);
 
     menu = glutCreateMenu(MenuHandle);
     glutSetMenu(menu);
-    glutAddMenuEntry("Open Image File", 1);
-    glutAddMenuEntry("Save Image File", 2);
+    glutAddMenuEntry("Open Image File", PIC_LOAD);
+    glutAddMenuEntry("Save Image File", PIC_SAVE);
     glutAddSubMenu("Look-Up-Tables", lutMenu);
-    glutAddMenuEntry("Exit", 0);
+    glutAddMenuEntry("Exit", EXIT);
     glutAttachMenu(GLUT_RIGHT_BUTTON);
 
     glutDisplayFunc(Display);
